@@ -3,21 +3,17 @@ package com.stroganov.jgate;
 import static org.junit.Assert.assertFalse;
 import org.junit.Test;
 
-import java.nio.file.Paths;
 import java.util.LinkedList;
 
 import ru.micexrts.cgate.CGate;
 import ru.micexrts.cgate.CGateException;
 import ru.micexrts.cgate.ErrorCode;
 
-import com.stroganov.jgate.schemas.FortsFutInfoRepl;
-import com.stroganov.jgate.schemas.listeners.FortsFutInfoReplListenerMngmntImpl;
-
 /**
  * Created by stroganov on 18.05.2016.
  */
 public class JGateTest {
-    @Test
+/*    @Test
     public void fortsFutInfoTest() throws CGateException, InterruptedException, IllegalAccessException {
         LinkedList<Integer> futIsinList = new LinkedList<>();
         Application app = Application.createInstance(new Application.Configurator() {
@@ -52,4 +48,5 @@ public class JGateTest {
         app.stop();
         assertFalse(futIsinList.isEmpty());
     }
+*/
 }

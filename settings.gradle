@@ -1,2 +1,5 @@
-rootProject.name = 'jgate'
+rootProject.name = 'JGate'
 
+include 'JGateSample'
+
+include 'JGateCodegenPlugin'

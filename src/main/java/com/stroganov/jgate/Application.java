@@ -1,7 +1,5 @@
 package com.stroganov.jgate;
 
-import com.stroganov.jgate.schemas.builder.SchemasBuilder;
-import com.stroganov.jgate.schemas.subscribers.StreamDataMessageSubscriber;
 import ru.micexrts.cgate.*;
 
 import java.util.HashMap;
@@ -21,7 +19,7 @@ public final class Application {
         String getAppName();
     }
 
-    enum ConnectionType {tcp, lrpcq}
+    public enum ConnectionType {tcp, lrpcq}
 
     /////////////////////////////////////////////////////////////
     //
@@ -52,18 +50,26 @@ public final class Application {
 
     /////////////////////////////////////////////////////////////
     //
-    // Builder
+    // DataFeedFabric
     //
-    public interface Builder {
-        SchemasBuilder newConnection(ConnectionSettings settings) throws CGateException;
-    }
-
     public interface DataFeedFabric {
         void createListener(String createSettings, String openSettings, StreamDataMessageSubscriber subscriber) throws CGateException;
 
         void createPublisher();
 
         void createPublishListener();
+    }
+
+    public interface SchemasBuilderFabric<T> {
+        T createInstance(final DataFeedFabric dataFeedFabric);
+    }
+
+    /////////////////////////////////////////////////////////////
+    //
+    // Builder
+    //
+    public interface Builder {
+        <T> T newConnection(ConnectionSettings settings, SchemasBuilderFabric<T> schemasBuilderFabric) throws CGateException;
     }
 
     private interface DataFeed {
@@ -228,9 +234,9 @@ public final class Application {
     private HashMap<String, JGateConnection> connections = new HashMap<>();
     private String cgateSettings;
 
-    private Application(String cgateSettings) throws IllegalAccessException, CGateException {
+    private Application(String cgateSettings) throws CGateException {
         if (cgateSettings == null || cgateSettings.isEmpty())
-            throw new IllegalAccessException("Parameter 'cgateSettings' can't be null or empty");
+            throw new IllegalArgumentException("Parameter 'cgateSettings' can't be null or empty");
         CGate.open(cgateSettings);
         this.cgateSettings = cgateSettings;
     }
@@ -258,13 +264,13 @@ public final class Application {
         }
     }
 
-    public static Application createInstance(Configurator config) throws CGateException, IllegalAccessException {
+    public static Application createInstance(Configurator config) throws CGateException {
         if (config == null)
             throw new IllegalArgumentException("Parameter 'config' can't be null");
         Application app = new Application(config.getCGateSettings());
         config.configure(new Builder() {
             @Override
-            public SchemasBuilder newConnection(ConnectionSettings settings) throws CGateException {
+            public <T> T newConnection(ConnectionSettings settings, SchemasBuilderFabric<T> schemasBuilderFabric) throws CGateException {
                 if (settings == null)
                     throw new IllegalArgumentException("Parameter 'settings' can't be null");
                 if (settings.type == null)
@@ -286,7 +292,7 @@ public final class Application {
                     sb.append(settings.type == ConnectionType.tcp ? ";timeout=" : ";local_timeout=").append(settings.timeout);
                 JGateConnection newConn = app.new JGateConnection(sb.toString());
                 app.connections.put(settings.connName, newConn);
-                return new SchemasBuilder(new DataFeedFabric() {
+                return schemasBuilderFabric.createInstance(new DataFeedFabric() {
                     @Override
                     public void createListener(String createSettings,
                                                String openSettings,

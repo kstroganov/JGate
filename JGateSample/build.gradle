@@ -1,0 +1,49 @@
+def CGATE_HOME = System.getenv('CGATE_HOME')
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'com.stroganov.jgate.codegen', name: 'JGateCodegenPlugin', version: '1.0-SNAPSHOT'
+    }
+}
+
+apply plugin: 'jgate'
+apply plugin: 'java'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'com.stroganov.jgate', name: 'JGate', version: '1.1-SNAPSHOT'
+    compile files("$CGATE_HOME/lib/cgate.jar")
+}
+
+compileJava.dependsOn generateJGateClasses
+version = '1.0'
+
+sourceSets {
+    generated {
+        java {
+            srcDirs = [ 'src/generated/java' ]
+        }
+    }
+    main {
+        java {
+            srcDirs = [ 'src/main/java' ]
+        }
+    }
+}
+
+compileJava.source sourceSets.generated.java, sourceSets.main.java
+
+jgate {
+    schemetool=file("$CGATE_HOME/bin")
+    generatedSrcDir=sourceSets.generated.java.srcDirs[0]
+    userPackage="com.stroganov.jgatesample"
+    schemas=files("fut_info.ini")
+}
