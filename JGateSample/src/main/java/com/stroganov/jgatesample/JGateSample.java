@@ -6,6 +6,7 @@ import com.stroganov.jgatesample.schemas.builder.SchemasBuilder;
 import com.stroganov.jgatesample.schemas.listeners.FortsFutInfoReplListenerImpl;
 import ru.micexrts.cgate.CGateException;
 import ru.micexrts.cgate.ErrorCode;
+import ru.micexrts.cgate.P2TypeParser;
 
 /**
  * Created by stroganov on 30.06.2016.
@@ -46,6 +47,7 @@ public class JGateSample {
                 return "JGateSample";
             }
         });
+        P2TypeParser.setCharset("Windows-1251");
         System.out.println("Active FORTS futures:");
         System.out.printf("%-60s %-10s %-10s\n", "Name", "ISIN", "State");
         app.run();
