@@ -55,7 +55,7 @@ class JGateGenerateClassesTask extends DefaultTask {
             cmd += "-o $scheme";
             cmd += "-Djava-user-package=${project.jgate.userPackage}.schemas";
             cmd += "-Djava-class-name=$it.name";
-            cmd += "$it.file.name $it.name";
+            cmd += "$it.file $it.name";
             def stdOut = new StringBuffer();
             def errOut = new StringBuffer();
             Process result = cmd.join(' ').execute();
